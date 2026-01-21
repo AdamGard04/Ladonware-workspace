@@ -1,0 +1,134 @@
+-- Q_detalle -> Q_DETAIL 
+b.REQUEST_SEQ AS REQUEST_SEQ,
+b.REQUEST_DATE AS REQUEST_DATE,
+b.USER_CODE AS USER_CODE,
+b.VALUE AS VALUE,
+b.CURRENCY_CODE AS CURRENCY_CODE,
+b.EXCHANGE_RATE AS EXCHANGE_RATE,
+b.CURRENCY_EXCHANGE_VALUE AS CURRENCY_EXCHANGE_VALUE,
+b.REFERENCE_NBR AS REFERENCE_NBR,
+b.BENEFICIARY AS BENEFICIARY,
+b.DESCRIPTION AS DESCRIPTION,
+b.EXCHANGE_TYPE_CODE AS EXCHANGE_TYPE_CODE
+FROM
+    BC_REQUEST_DETAILS b
+    -- Q_maestro -> Q_MASTER
+SELECT
+    a.REQUEST_SEQ AS REQUEST_SEQ,
+    a.USER_CODE AS USER_CODE,
+    a.REQUEST_DATE AS REQUEST_DATE,
+    a.TRANSACTION_TYPE_CODE AS TRANSACTION_TYPE_CODE,
+    a.APPLICATION_CODE AS APPLICATION_CODE,
+    a.CONCEPT_TRANSACTION_CODE AS CONCEPT_TRANSACTION_CODE,
+    a.CONCEPT_APPLICATION_CODE AS CONCEPT_APPLICATION_CODE,
+    a.CURRENCY_CODE AS CURRENCY_CODE,
+    a.REQUEST_STATE AS REQUEST_STATE,
+    a.AUXILIARY_APPLICATION_CODE AS AUXILIARY_APPLICATION_CODE
+FROM
+    BC_TRANSACTIONS_REQUESTS a
+WHERE
+    a.TRANSACTION_TYPE_CODE = 2
+    AND a.REQUEST_DATE BETWEEN NVL (p_start_date, a.REQUEST_DATE) AND NVL  (p_end_date, a.REQUEST_DATE)
+ORDER BY
+    a.CONCEPT_TRANSACTION_CODE,
+    a.CURRENCY_CODE
+
+
+-- funciones:
+
+-- F_CF_estado
+FUNCTION CF_request_status RETURN VARCHAR2 IS
+    var_status        VARCHAR2(180);
+BEGIN
+    IF :request_state = 'A' THEN
+        var_status := 'PROCESSED TRANSACTIONS';
+        RETURN(var_status);
+    ELSE
+        -- var_status := 'UNPROCESSED TRANSACTIONS';
+        var_status := 'REVERSED TRANSACTIONS';
+        RETURN(var_status);
+    END IF;
+    RETURN NULL; 
+END;
+
+
+-- F_CF_tran
+FUNCTION CF_transaction RETURN VARCHAR2 IS
+    var_transaction        VARCHAR2(80);
+BEGIN
+    SELECT  description 
+    INTO    var_transaction
+    FROM    MG_TRANSACTION_TYPES
+    WHERE   TRANSACTION_TYPE_CODE = Q_MASTER.TRANSACTION_TYPE_CODE 
+      AND   APPLICATION_CODE = Q_MASTER.APPLICATION_CODE;
+    RETURN(var_transaction);
+    RETURN NULL; 
+EXCEPTION 
+    WHEN OTHERS THEN 
+        RETURN NULL;
+END;
+
+
+-- F_CF_conc
+FUNCTION CF_concept RETURN VARCHAR2 IS
+    var_concept     VARCHAR2(80);
+BEGIN
+    SELECT  description 
+    INTO    var_concept
+    FROM    MG_TRANSACTION_TYPES
+    WHERE   TRANSACTION_TYPE_CODE = Q_MASTER.concept_transaction_code 
+      AND   APPLICATION_CODE = Q_MASTER.concept_application_code;
+    RETURN(var_concept);
+    RETURN NULL; 
+EXCEPTION 
+    WHEN OTHERS THEN 
+        RETURN NULL;
+END;
+
+
+-- F_CF_mon
+FUNCTION CF_currency RETURN VARCHAR2 IS
+    var_currency        VARCHAR2(80);
+BEGIN
+    SELECT  description 
+    INTO    var_currency
+    FROM    MG_CURRENCY
+    WHERE   currency_code = Q_MASTER.currency_code;
+    RETURN(var_currency);
+    RETURN NULL; 
+EXCEPTION 
+    WHEN OTHERS THEN 
+        RETURN NULL;
+END;
+
+
+-- F_CF_aux
+FUNCTION CF_auxiliary_application RETURN VARCHAR2 IS
+    var_auxiliary     VARCHAR2(80);
+BEGIN
+    SELECT  name 
+    INTO    var_auxiliary
+    FROM    MG_APPLICATIONS
+    WHERE   application_code = Q_MASTER.auxiliary_application_code;
+    RETURN(var_auxiliary);
+    RETURN NULL; 
+EXCEPTION 
+    WHEN OTHERS THEN 
+        RETURN NULL;
+END;
+
+
+-- F_CF_pago
+FUNCTION CF_redemption_type RETURN VARCHAR2 IS
+    var_redemption       VARCHAR2(80);
+BEGIN
+    SELECT  description 
+    INTO    var_redemption
+    FROM    MG_TYPES_OF_REDEMPTION
+    WHERE   exchange_type_code = Q_MASTER.exchange_type_code;
+    RETURN(var_redemption);
+    RETURN NULL; 
+EXCEPTION 
+    WHEN OTHERS THEN 
+        RETURN NULL;
+END;

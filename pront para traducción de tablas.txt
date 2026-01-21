@@ -1,0 +1,22 @@
+Para consultas SQL:
+Analiza estas consultas y los esquemas que se encuentran en el archivo LADONWARE-TABLES. 
+En base a esos datos necesito que me ayudes a reemplazar en las consultas los campos y las 
+tablas de español a inglés pero con una jerga financiera, tanto nombres, alias y parámetros. 
+Solo haz estas modificaciones con las tablas y campos que se encuentren disponibles, dejaré
+colocado el nombre de las tablas en las consultas para que en base a eso busques y reemplaces 
+los campos respectivos. Recuerda mantener la funcionalidad y lógica acorde a como están las 
+consultas actualmente. Por si acaso, para algunas tablas no tengo su respectivo query pero si 
+están los campos y como comentario está puesto el nombre tal cual (puede que esté en español 
+usa su nombre tal cual) como está en la base de datos por si llegan a ser requeridas. 
+
+
+Estructura 
+el query con un formato tipo Old-style joins / Oracle legacy join syntax para que se vea mejor
+organizado
+
+
+	Haz un análisis comparativo de estos dos archivos con el fin de asegurarse de que la versión traducida vaya acorde a los querys originales en español
+
+
+Para funciones:
+	Necesito que analices detenidamente el archivo LADONWARE-TABLES.sql, en base a eso necesito pasar las funciones de español a inglés en el archivo TQueryBBC1000 con los campos del archivo LADONWARE-TABLES que es donde se encuentran los nombres de los campos en la base de datos, así mismo nombres, alias y parámetros si es que utilizan también traducidos como se realizó en las consultas, además a las variables también se deben traducir al ingles. Recuerda que se debe mantener la estructura y lógica que como estaban originalmente. Los comentarios eso si mantenlos como están por ahora

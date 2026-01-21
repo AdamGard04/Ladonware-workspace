@@ -1,0 +1,70 @@
+/*
+(10)CF - CF_FORMULA.Q_MATRICIAL.CF_FORMULA
+(20)BD - F_descripcion.Q_MATRICIAL.DESCRIPTION
+(30)BD - F_saldo.Q_MATRICIAL.BALANCE
+(40)CONTEO - F_CS_total_registros
+ */
+--Q_MATRICIAL
+SELECT
+    a.LEVEL_1 AS LEVEL_1,
+    a.LEVEL_2 AS LEVEL_2,
+    a.LEVEL_3 AS LEVEL_3,
+    a.LEVEL_4 AS LEVEL_4,
+    a.LEVEL_5 AS LEVEL_5,
+    a.LEVEL_6 AS LEVEL_6,
+    a.LEVEL_7 AS LEVEL_7,
+    a.LEVEL_8 AS LEVEL_8,
+    a.BALANCE AS BALANCE,
+    b.DESCRIPTION AS DESCRIPTION,
+    c.NAME AS NAME
+FROM
+    GM_COMPANIES_CONSOLIDATION a,
+    GM_ACCOUNT_BALANCE b,
+    MG_EMPRESAS c,
+    GM_CATALOGS d
+WHERE
+    b.LEVEL_1 (+) = a.LEVEL_1
+    AND b.LEVEL_2 (+) = a.LEVEL_2
+    AND b.LEVEL_3 (+) = a.LEVEL_3
+    AND b.LEVEL_4 (+) = a.LEVEL_4
+    AND b.LEVEL_5 (+) = a.LEVEL_5
+    AND b.LEVEL_6 (+) = a.LEVEL_6
+    AND b.LEVEL_7 (+) = a.LEVEL_7
+    AND b.LEVEL_8 (+) = a.LEVEL_8
+    AND c.COMPANY_CODE (+) = a.COMPANY_CODE
+    AND d.LEVEL_1 = a.LEVEL_1
+    AND d.LEVEL_2 = a.LEVEL_2
+    AND d.LEVEL_3 = a.LEVEL_3
+    AND d.LEVEL_4 = a.LEVEL_4
+    AND d.LEVEL_5 = a.LEVEL_5
+    AND d.LEVEL_6 = a.LEVEL_6
+    AND d.ACCOUNT_CLASS NOT IN ('ENC', 'SUM')
+ORDER BY
+    a.LEVEL_1,
+    a.LEVEL_2,
+    a.LEVEL_3,
+    a.LEVEL_4,
+    a.LEVEL_5,
+    a.LEVEL_6,
+    a.LEVEL_7,
+    a.LEVEL_8;
+
+-- Functions:
+function CF_FORMULA return VARCHAR2 is PV_FORMAT VARCHAR2 (39);
+
+begin GM_P_DESPLEGAR_R (
+    Q_MATRZ.LEVEL_1,
+    Q_MATRZ.LEVEL_2,
+    Q_MATRZ.LEVEL_3,
+    Q_MATRZ.LEVEL_4,
+    Q_MATRZ.LEVEL_5,
+    Q_MATRZ.LEVEL_6,
+    Q_MATRZ.LEVEL_7,
+    Q_MATRZ.LEVEL_8,
+    P_COMPANY_CODE,
+    PV_FORMAT
+);
+
+RETURN (PV_FORMAT);
+
+end;
