@@ -1,13 +1,40 @@
 
--- CP_DEBIT_BALANCE
--- CP_CREDIT_BALANCE
+-- ============================================
+-- PARÁMETROS DE ENTRADA (P_) - En orden de uso
+-- ============================================
+-- P_REPORT_DATE        -- Fecha inicial del reporte (usado en effdate >= y cálculo de saldo anterior)
+-- P_END_DATE           -- Fecha final del reporte (usado en effdate <=)
+-- P_COMPANY_CODE       -- Código de compañía
+-- P_LEVEL_1             -- Nivel 1 de cuenta (rango desde)
+-- P_LEVEL_1_1           -- Nivel 1 de cuenta (rango hasta)
+-- P_LEVEL_2             -- Nivel 2 de cuenta (rango desde)
+-- P_LEVEL_2_2           -- Nivel 2 de cuenta (rango hasta)
+-- P_LEVEL_3             -- Nivel 3 de cuenta (rango desde)
+-- P_LEVEL_3_3           -- Nivel 3 de cuenta (rango hasta)
+-- P_LEVEL_4             -- Nivel 4 de cuenta (rango desde)
+-- P_LEVEL_4_4           -- Nivel 4 de cuenta (rango hasta)
+-- P_LEVEL_5             -- Nivel 5 de cuenta (rango desde)
+-- P_LEVEL_5_5           -- Nivel 5 de cuenta (rango hasta)
+-- P_LEVEL_6             -- Nivel 6 de cuenta (rango desde)
+-- P_LEVEL_6_6           -- Nivel 6 de cuenta (rango hasta)
+-- P_LEVEL_7             -- Nivel 7 de cuenta (rango desde)
+-- P_LEVEL_7_7           -- Nivel 7 de cuenta (rango hasta)
+-- P_LEVEL_8             -- Nivel 8 de cuenta (rango desde)
+-- P_LEVEL_8_8           -- Nivel 8 de cuenta (rango hasta)
+-- P_AUXILIARY_CODE     -- Código auxiliar
+-- P_USER               -- Usuario
+-- P_AUXILIARY_REF      -- Referencia auxiliar
+-- P_CURRENCY_CODE             -- Código de moneda
 
--- P_LEVEL_1  '1418'
--- P_REPORT_DATE 30/11/2018
--- P_END_DATE 30/11/2018
--- CP_DESC_CUENTA
--- CP_AUXILIAR
+-- ============================================
+-- PARÁMETROS DE SALIDA/COLUMNAS (CP_) - En orden de uso
+-- ============================================
+-- CP_COMPANY_CODE      -- Código de compañía (usado en funciones CF_ACCOUNT, CF_BALANCE_RUN)
+-- CP_DESC_CUENTA       -- Descripción de la cuenta (asignado en CF_ACCOUNT)
+-- CP_DEBIT_BALANCE     -- Saldo deudor acumulado (asignado en CF_BALANCE_RUN)
+-- CP_CREDIT_BALANCE    -- Saldo acreedor acumulado (asignado en CF_BALANCE_RUN)
 
+-- Q_MOV_ACCOUNTS
 SELECT
     a.level_1 level_1,
     a.level_2 level_2,
@@ -48,29 +75,29 @@ FROM
     GM_ANNUAL_TXN_ENTRIES_DETAIL a,
     GM_SETTINGS e
 WHERE
-    a.effdate >= :p_fecha_reporte
-    AND a.effdate <= :p_fecha_final
-    AND a.level_1 BETWEEN NVL(:plevel_1, a.level_1)
-    AND DECODE(:plevel_1_1, NULL, DECODE(:plevel_1, NULL, a.level_1, :plevel_1), :plevel_1_1)
-    AND a.level_2 BETWEEN NVL(:plevel_2, a.level_2)
-    AND DECODE(:plevel_2_2, NULL, DECODE(:plevel_2, NULL, a.level_2, :plevel_2), :plevel_2_2)
-    AND a.level_3 BETWEEN NVL(:plevel_3, a.level_3)
-    AND DECODE(:plevel_3_3, NULL, DECODE(:plevel_3, NULL, a.level_3, :plevel_3), :plevel_3_3)
-    AND a.level_4 BETWEEN NVL(:plevel_4, a.level_4)
-    AND DECODE(:plevel_4_4, NULL, DECODE(:plevel_4, NULL, a.level_4, :plevel_4), :plevel_4_4)
-    AND a.level_5 BETWEEN NVL(:plevel_5, a.level_5)
-    AND DECODE(:plevel_5_5, NULL, DECODE(:plevel_5, NULL, a.level_5, :plevel_5), :plevel_5_5)
-    AND a.level_6 BETWEEN NVL(:plevel_6, a.level_6)
-    AND DECODE(:plevel_6_6, NULL, DECODE(:plevel_6, NULL, a.level_6, :plevel_6), :plevel_6_6)
-    AND a.level_7 BETWEEN NVL(:plevel_7, a.level_7)
-    AND DECODE(:plevel_7_7, NULL, DECODE(:plevel_7, NULL, a.level_7, :plevel_7), :plevel_7_7)
-    AND a.level_8 BETWEEN NVL(:plevel_8, a.level_8)
-    AND DECODE(:plevel_8_8, NULL, DECODE(:plevel_8, NULL, a.level_8, :plevel_8), :plevel_8_8)
-    AND a.company_code = :p_codigo_empresa
-    AND (a.auxiliary_code = NVL(:P_AUXILIARY_CODE, a.auxiliary_code) OR a.auxiliary_code IS NULL)
-    AND a.username = NVL(:p_usuario, a.username)
-    AND (a.ref_auxiliary_code = :p_auxiliar_ref OR :p_auxiliar_ref IS NULL)
-    AND a.currency_code = NVL(:p_moneda, a.currency_code)
+    a.effdate >= P_REPORT_DATE
+    AND a.effdate <= P_END_DATE
+    AND a.level_1 BETWEEN NVL(P_LEVEL_1, a.level_1)
+    AND DECODE(P_LEVEL_1_1, NULL, DECODE(P_LEVEL_1, NULL, a.level_1, P_LEVEL_1), P_LEVEL_1_1)
+    AND a.level_2 BETWEEN NVL(P_LEVEL_2, a.level_2)
+    AND DECODE(P_LEVEL_2_2, NULL, DECODE(P_LEVEL_2, NULL, a.level_2, P_LEVEL_2), P_LEVEL_2_2)
+    AND a.level_3 BETWEEN NVL(P_LEVEL_3, a.level_3)
+    AND DECODE(P_LEVEL_3_3, NULL, DECODE(P_LEVEL_3, NULL, a.level_3, P_LEVEL_3), P_LEVEL_3_3)
+    AND a.level_4 BETWEEN NVL(P_LEVEL_4, a.level_4)
+    AND DECODE(P_LEVEL_4_4, NULL, DECODE(P_LEVEL_4, NULL, a.level_4, P_LEVEL_4), P_LEVEL_4_4)
+    AND a.level_5 BETWEEN NVL(P_LEVEL_5, a.level_5)
+    AND DECODE(P_LEVEL_5_5, NULL, DECODE(P_LEVEL_5, NULL, a.level_5, P_LEVEL_5), P_LEVEL_5_5)
+    AND a.level_6 BETWEEN NVL(P_LEVEL_6, a.level_6)
+    AND DECODE(P_LEVEL_6_6, NULL, DECODE(P_LEVEL_6, NULL, a.level_6, P_LEVEL_6), P_LEVEL_6_6)
+    AND a.level_7 BETWEEN NVL(P_LEVEL_7, a.level_7)
+    AND DECODE(P_LEVEL_7_7, NULL, DECODE(P_LEVEL_7, NULL, a.level_7, P_LEVEL_7), P_LEVEL_7_7)
+    AND a.level_8 BETWEEN NVL(P_LEVEL_8, a.level_8)
+    AND DECODE(P_LEVEL_8_8, NULL, DECODE(P_LEVEL_8, NULL, a.level_8, P_LEVEL_8), P_LEVEL_8_8)
+    AND a.company_code = P_COMPANY_CODE
+    AND (a.auxiliary_code = NVL(P_AUXILIARY_CODE, a.auxiliary_code) OR a.auxiliary_code IS NULL)
+    AND a.username = NVL(P_USER, a.username)
+    AND (a.ref_auxiliary_code = P_AUXILIARY_REF OR P_AUXILIARY_REF IS NULL)
+    AND a.currency_code = NVL(P_CURRENCY_CODE, a.currency_code)
     AND e.company_code = a.company_code
 ORDER BY
     a.level_1,
