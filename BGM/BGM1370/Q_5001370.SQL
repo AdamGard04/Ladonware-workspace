@@ -5,22 +5,22 @@
 -- P_REPORT_DATE        -- Fecha inicial del reporte (usado en effdate >= y cálculo de saldo anterior)
 -- P_END_DATE           -- Fecha final del reporte (usado en effdate <=)
 -- P_COMPANY_CODE       -- Código de compañía
--- P_LEVEL_1             -- Nivel 1 de cuenta (rango desde)
--- P_LEVEL_1_1           -- Nivel 1 de cuenta (rango hasta)
--- P_LEVEL_2             -- Nivel 2 de cuenta (rango desde)
--- P_LEVEL_2_2           -- Nivel 2 de cuenta (rango hasta)
--- P_LEVEL_3             -- Nivel 3 de cuenta (rango desde)
--- P_LEVEL_3_3           -- Nivel 3 de cuenta (rango hasta)
--- P_LEVEL_4             -- Nivel 4 de cuenta (rango desde)
--- P_LEVEL_4_4           -- Nivel 4 de cuenta (rango hasta)
--- P_LEVEL_5             -- Nivel 5 de cuenta (rango desde)
--- P_LEVEL_5_5           -- Nivel 5 de cuenta (rango hasta)
--- P_LEVEL_6             -- Nivel 6 de cuenta (rango desde)
--- P_LEVEL_6_6           -- Nivel 6 de cuenta (rango hasta)
--- P_LEVEL_7             -- Nivel 7 de cuenta (rango desde)
--- P_LEVEL_7_7           -- Nivel 7 de cuenta (rango hasta)
--- P_LEVEL_8             -- Nivel 8 de cuenta (rango desde)
--- P_LEVEL_8_8           -- Nivel 8 de cuenta (rango hasta)
+-- P_LEVEL_1_FROM             -- Nivel 1 de cuenta (rango desde)
+-- P_LEVEL_1_TO           -- Nivel 1 de cuenta (rango hasta)
+-- P_LEVEL_2_FROM             -- Nivel 2 de cuenta (rango desde)
+-- P_LEVEL_2_TO           -- Nivel 2 de cuenta (rango hasta)
+-- P_LEVEL_3_FROM             -- Nivel 3 de cuenta (rango desde)
+-- P_LEVEL_3_TO           -- Nivel 3 de cuenta (rango hasta)
+-- P_LEVEL_4_FROM             -- Nivel 4 de cuenta (rango desde)
+-- P_LEVEL_4_TO           -- Nivel 4 de cuenta (rango hasta)
+-- P_LEVEL_5_FROM             -- Nivel 5 de cuenta (rango desde)
+-- P_LEVEL_5_TO           -- Nivel 5 de cuenta (rango hasta)
+-- P_LEVEL_6_FROM             -- Nivel 6 de cuenta (rango desde)
+-- P_LEVEL_6_TO           -- Nivel 6 de cuenta (rango hasta)
+-- P_LEVEL_7_FROM             -- Nivel 7 de cuenta (rango desde)
+-- P_LEVEL_7_TO           -- Nivel 7 de cuenta (rango hasta)
+-- P_LEVEL_8_FROM             -- Nivel 8 de cuenta (rango desde)
+-- P_LEVEL_8_TO           -- Nivel 8 de cuenta (rango hasta)
 -- P_AUXILIARY_CODE     -- Código auxiliar
 -- P_USER               -- Usuario
 -- P_AUXILIARY_REF      -- Referencia auxiliar
@@ -77,22 +77,22 @@ FROM
 WHERE
     a.effdate >= P_REPORT_DATE
     AND a.effdate <= P_END_DATE
-    AND a.level_1 BETWEEN NVL(P_LEVEL_1, a.level_1)
-    AND DECODE(P_LEVEL_1_1, NULL, DECODE(P_LEVEL_1, NULL, a.level_1, P_LEVEL_1), P_LEVEL_1_1)
-    AND a.level_2 BETWEEN NVL(P_LEVEL_2, a.level_2)
-    AND DECODE(P_LEVEL_2_2, NULL, DECODE(P_LEVEL_2, NULL, a.level_2, P_LEVEL_2), P_LEVEL_2_2)
-    AND a.level_3 BETWEEN NVL(P_LEVEL_3, a.level_3)
-    AND DECODE(P_LEVEL_3_3, NULL, DECODE(P_LEVEL_3, NULL, a.level_3, P_LEVEL_3), P_LEVEL_3_3)
-    AND a.level_4 BETWEEN NVL(P_LEVEL_4, a.level_4)
-    AND DECODE(P_LEVEL_4_4, NULL, DECODE(P_LEVEL_4, NULL, a.level_4, P_LEVEL_4), P_LEVEL_4_4)
-    AND a.level_5 BETWEEN NVL(P_LEVEL_5, a.level_5)
-    AND DECODE(P_LEVEL_5_5, NULL, DECODE(P_LEVEL_5, NULL, a.level_5, P_LEVEL_5), P_LEVEL_5_5)
-    AND a.level_6 BETWEEN NVL(P_LEVEL_6, a.level_6)
-    AND DECODE(P_LEVEL_6_6, NULL, DECODE(P_LEVEL_6, NULL, a.level_6, P_LEVEL_6), P_LEVEL_6_6)
-    AND a.level_7 BETWEEN NVL(P_LEVEL_7, a.level_7)
-    AND DECODE(P_LEVEL_7_7, NULL, DECODE(P_LEVEL_7, NULL, a.level_7, P_LEVEL_7), P_LEVEL_7_7)
-    AND a.level_8 BETWEEN NVL(P_LEVEL_8, a.level_8)
-    AND DECODE(P_LEVEL_8_8, NULL, DECODE(P_LEVEL_8, NULL, a.level_8, P_LEVEL_8), P_LEVEL_8_8)
+    AND a.level_1 BETWEEN NVL(P_LEVEL_1_FROM, a.level_1)
+    AND DECODE(P_LEVEL_1_TO, NULL, DECODE(P_LEVEL_1_FROM, NULL, a.level_1, P_LEVEL_1_FROM), P_LEVEL_1_TO)
+    AND a.level_2 BETWEEN NVL(P_LEVEL_2_FROM, a.level_2)
+    AND DECODE(P_LEVEL_2_TO, NULL, DECODE(P_LEVEL_2_FROM, NULL, a.level_2, P_LEVEL_2_FROM), P_LEVEL_2_TO)
+    AND a.level_3 BETWEEN NVL(P_LEVEL_3_FROM, a.level_3)
+    AND DECODE(P_LEVEL_3_TO, NULL, DECODE(P_LEVEL_3_FROM, NULL, a.level_3, P_LEVEL_3_FROM), P_LEVEL_3_TO)
+    AND a.level_4 BETWEEN NVL(P_LEVEL_4_FROM, a.level_4)
+    AND DECODE(P_LEVEL_4_TO, NULL, DECODE(P_LEVEL_4_FROM, NULL, a.level_4, P_LEVEL_4_FROM), P_LEVEL_4_TO)
+    AND a.level_5 BETWEEN NVL(P_LEVEL_5_FROM, a.level_5)
+    AND DECODE(P_LEVEL_5_TO, NULL, DECODE(P_LEVEL_5_FROM, NULL, a.level_5, P_LEVEL_5_FROM), P_LEVEL_5_TO)
+    AND a.level_6 BETWEEN NVL(P_LEVEL_6_FROM, a.level_6)
+    AND DECODE(P_LEVEL_6_TO, NULL, DECODE(P_LEVEL_6_FROM, NULL, a.level_6, P_LEVEL_6_FROM), P_LEVEL_6_TO)
+    AND a.level_7 BETWEEN NVL(P_LEVEL_7_FROM, a.level_7)
+    AND DECODE(P_LEVEL_7_TO, NULL, DECODE(P_LEVEL_7_FROM, NULL, a.level_7, P_LEVEL_7_FROM), P_LEVEL_7_TO)
+    AND a.level_8 BETWEEN NVL(P_LEVEL_8_FROM, a.level_8)
+    AND DECODE(P_LEVEL_8_TO, NULL, DECODE(P_LEVEL_8_FROM, NULL, a.level_8, P_LEVEL_8_FROM), P_LEVEL_8_TO)
     AND a.company_code = P_COMPANY_CODE
     AND (a.auxiliary_code = NVL(P_AUXILIARY_CODE, a.auxiliary_code) OR a.auxiliary_code IS NULL)
     AND a.username = NVL(P_USER, a.username)
@@ -117,7 +117,7 @@ ORDER BY
 
 
 -- FUNCIONES:
-
+-- F_CF_Cuenta
 function CF_ACCOUNT return VARCHAR2 is
   LV_ACCOUNT VARCHAR2(39);
   LV_DESCRIPTION Varchar2(80) := Null;
@@ -159,6 +159,8 @@ end;
   RETURN(LV_ACCOUNT);
 END;
 
+
+-- F_INICIO_MES
 function CF_BF_BALANCE return Number is
 
  LN_BF_BALANCE  Number(17,2) := 0;
@@ -205,14 +207,14 @@ BEGIN
       INTO   LN_BF_BALANCE
       FROM   GM_BALANCES_DAILY
       WHERE  COMPANY_CODE = CP_COMPANY_CODE
-      AND    LEVEL_1      =  Q_MOVE_ACCOUNTS.LEVEL_1
-      AND    LEVEL_2      =  Q_MOVE_ACCOUNTS.LEVEL_2
-      AND    LEVEL_3      =  Q_MOVE_ACCOUNTS.LEVEL_3
-      AND    LEVEL_4      =  Q_MOVE_ACCOUNTS.LEVEL_4
-      AND    LEVEL_5      =  Q_MOVE_ACCOUNTS.LEVEL_5
-      AND    LEVEL_6      =  Q_MOVE_ACCOUNTS.LEVEL_6
-      AND    LEVEL_7      =  Q_MOVE_ACCOUNTS.LEVEL_7
-      AND    LEVEL_8      =  Q_MOVE_ACCOUNTS.LEVEL_8
+      AND    LEVEL_1      =  Q_MOV_ACCOUNTS.LEVEL_1
+      AND    LEVEL_2      =  Q_MOV_ACCOUNTS.LEVEL_2
+      AND    LEVEL_3      =  Q_MOV_ACCOUNTS.LEVEL_3
+      AND    LEVEL_4      =  Q_MOV_ACCOUNTS.LEVEL_4
+      AND    LEVEL_5      =  Q_MOV_ACCOUNTS.LEVEL_5
+      AND    LEVEL_6      =  Q_MOV_ACCOUNTS.LEVEL_6
+      AND    LEVEL_7      =  Q_MOV_ACCOUNTS.LEVEL_7
+      AND    LEVEL_8      =  Q_MOV_ACCOUNTS.LEVEL_8
       AND    YEAR         =  LN_YEAR
       AND    MONTH        =  LN_MONTH;
 	    Return NVL(LN_BF_BALANCE, 0);
@@ -225,6 +227,10 @@ BEGIN
 
     RETURN 0; 
 END;
+
+
+
+--F_codigo_moneda
 
 function CF_CURRENCY_CODE return Number is
  LN_CURRENCY_CODE NUMBER;
@@ -244,6 +250,9 @@ begin
  RETURN NVL(LN_CURRENCY_CODE, 0);
 end;
 
+
+
+-- F_desc_moneda
 function CF_DESC_CURRENCY return VARCHAR2 is
   LV_CURRENCY VARCHAR2(200);
 begin
@@ -261,16 +270,21 @@ begin
   RETURN NVL(LV_CURRENCY, '');
 end;
 
+
+
+-- F_tasa
 FUNCTION CF_EXCHANGE_RATE return Number is
 BEGIN
   IF Q_MOV_ACCOUNTS.CURRENCY_CODE != 1 THEN
-    RETURN( ABS(Q_MOVE_ACCOUNTS.EXCHANGE_RATE) );
+    RETURN( ABS(Q_MOV_ACCOUNTS.EXCHANGE_RATE) );
 ELSE 
     RETURN(0);
 END IF;  
   RETURN 0; 
 END;
 
+
+-- F_1
 FUNCTION CF_RUN_AMOUNT return Number is
 BEGIN
 
@@ -278,6 +292,8 @@ BEGIN
 
 END;
 
+
+-- F_monto_debito
 function CF_MOV_DEBIT return Number is
 BEGIN
   IF Q_MOV_ACCOUNTS.CREDIT_DEBIT = 'D' THEN
@@ -292,6 +308,8 @@ BEGIN
   RETURN 0; 
 end;
 
+
+-- F_monto_credito
 function CF_MOV_CREDIT return Number is
 begin
 IF Q_MOV_ACCOUNTS.CREDIT_DEBIT = 'C' THEN
@@ -340,7 +358,7 @@ begin
 					Q_MOV_ACCOUNTS.level_6,
 					Lv_Nature_Cta);
   IF  (Lv_Nature_Cta = 'D')  THEN
-    Current_Balance:= CF_BF_BALANCE + CS_SALDO_RUN;
+    Current_Balance := CF_BF_BALANCE + CS_SALDO_RUN;
 
     if Current_Balance < 0 then
      CP_CREDIT_BALANCE := abs(Current_Balance);
