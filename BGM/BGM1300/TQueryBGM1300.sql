@@ -77,7 +77,7 @@ or  0 != ( select nvl(sum(abs(txn_entry_amount)),0)
                         and m.level_6               = a.level_6
                         and m.level_7               = a.level_7
                         and m.level_8               = a.level_8
-                        and m.txn_entry_date <= P_REPORT_DATE)
+                        and m.TXN_ENTRY_DATE <= P_REPORT_DATE)
      )
 
 Order by a.company_code, 
@@ -91,9 +91,9 @@ function CF_Label1 return VARCHAR2 is
 Lv_Label	GM_PARAMETER_ACCOUNTS_STRUCTURE.level_1_description%TYPE := NULL;
 begin
   SELECT DECODE(P_BREAK_LEVEL1, 1, level_1_description, 2, level_2_description, 
-		3, nivel_3_descripcion, 4, nivel_4_description,
+		3, level_3_descripcion, 4, level_4_description,
 		5, level_5_description, 6, level_6_description,
-		7, nivel_7_descripcion, 8, level_8_description)
+		7, level_7_descripcion, 8, level_8_description)
   INTO Lv_Label
   FROM GM_PARAMETER_ACCOUNTS_STRUCTURE
   WHERE company_code = TO_NUMBER(P_COMPANY_CODE);
@@ -149,7 +149,10 @@ FUNCTION CF_TOTALS (
   Pv_Level7        IN VARCHAR2,
   Pv_Level8        IN VARCHAR2,
   Pd_Date          IN DATE,
-  Pn_PriorBalance  IN NUMBER
+  Pn_PriorBalance  IN NUMBER,
+  Pn_TotalDb          IN OUT NUMBER,
+  Pn_TotalCr           IN OUT NUMBER,
+  Pn_SaldoActual      IN OUT NUMBER
 ) RETURN NUMBER IS
 
   Lv_AccountNature   VARCHAR2(1);
@@ -191,12 +194,12 @@ BEGIN
     AND level_6 = Pv_Level6
     AND level_7 = Pv_Level7
     AND level_8 = Pv_Level8
-    AND B.username         = A.username
-    AND B.txn_entry_nbr    = A.txn_entry_nbr
-    AND B.txn_entry_date   = A.txn_entry_date
-    AND B.effective_date <= Pd_Date
-    AND B.updated          = 'N'
-    AND A.company_code     = C.company_code;
+    AND B.USERNAME         = A.USERNAME
+    AND B.TXN_ENTRY_NBR    = A.TXN_ENTRY_NBR
+    AND B.TXN_ENTRY_DATE   = A.TXN_ENTRY_DATE
+    AND B.EFFDATE <= Pd_Date
+    AND B.CURR          = 'N'
+    AND A.COMPANY_CODE     = C.COMPANY_CODE;
 
   Lv_Error := GM_F_NATURALEZA_CUENTA(
                 Pn_CompanyCode,
@@ -230,7 +233,7 @@ BEGIN
 EXCEPTION
   WHEN OTHERS THEN
     RETURN NULL;
-END CF_TOTALS;
+END;
 
 
 
@@ -240,7 +243,7 @@ Ln_Balance  NUMBER(20,2);
 begin
   CF_TOTALS(To_Number(P_COMPANY_CODE), Q_ACCOUNTS.LEVEL_1, Q_ACCOUNTS.LEVEL_2,Q_ACCOUNTS.LEVEL_3, Q_ACCOUNTS.LEVEL_4,
 		 Q_ACCOUNTS.LEVEL_5, Q_ACCOUNTS.LEVEL_6,Q_ACCOUNTS.LEVEL_7, Q_ACCOUNTS.LEVEL_8,P_REPORT_DATE,
-		 :Saldo_Anterior, CP_DEBIT, CP_CREDIT, Ln_Balance);
+		 Q_ACCOUNTS.PRIOR_BALANCE, CP_DEBIT, CP_CREDIT, Ln_Balance);
   RETURN(Ln_Balance);
 end; --CORREGIR Saldo_Anterior: IDENTIFICAR DE DONDE VIENE
 
@@ -282,7 +285,7 @@ RETURN NULL; end;
 
 
 
--- F_CF_Saldo_Dia1 o CP_SALDO_ACR
+-- F_CF_Saldo_Dia1 o CP_CREDIT_BALANCE
 
 
 
@@ -332,3 +335,46 @@ RETURN NULL; end;
 
 
 --F_CS_Saldo_Dia_Suc2
+
+functionCF_DAYLI_BALANCE return Number is
+begin
+declare 
+  Lv_Account_Nature VARCHAR2(1);
+  Lv_ErrorCode       VARCHAR2(200):=NULL ;
+  Lv_type_code varchar2(1);
+begin  
+   Lv_ErrorCode := GM_F_NATURALEZA_CUENTA(:P_Codigo_Empresa,
+					Q_ACCOUNTS.level_1, 
+					Q_ACCOUNTS.level_2,
+					Q_ACCOUNTS.level_3,
+					Q_ACCOUNTS.level_4,
+					Q_ACCOUNTS.level_5,
+					Q_ACCOUNTS.level_6,
+					Lv_Account_Nature);
+  IF  ( Lv_Account_Nature = 'D')
+  THEN
+    RETURN (CF_CURRENT_BALANCE);
+  ELSIF ( Lv_Account_Nature = 'C' ) THEN
+    RETURN ((CF_CURRENT_BALANCE) * -1 );
+  END IF;
+end;
+RETURN NULL; end;
+
+
+
+--F_CS_Saldo_Dia_Suc2
+-- CF_saldo_a_dFormula
+function CF_BALANCE_A_D return Number is
+begin
+     if CF_DAYLI_BALANCE > 0 then
+        CP_DEBIT_BALANCE:= abs(CF_DAYLI_BALANCE); 
+        CP_CREDIT_BALANCE:=0;
+     ELSIF CF_DAYLI_BALANCE < 0 THEN
+        CP_CREDIT_BALANCE := abs(CF_DAYLI_BALANCE); 
+        CP_DEBIT_BALANCE:=0;
+     ELSIF CF_DAYLI_BALANCE = 0 THEN 
+     	CP_CREDIT_BALANCE := 0; 
+     	CP_DEBIT_BALANCE:=0;
+     END IF;
+return(0);
+end;
