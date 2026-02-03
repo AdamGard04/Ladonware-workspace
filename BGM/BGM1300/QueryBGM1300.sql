@@ -261,7 +261,29 @@ RETURN NULL; end;
 -- F_CS_total_registros1
 
 
-
+function CF_Saldo_Dia_Calc return Number is
+begin
+declare 
+  Lv_Naturaleza_Cta VARCHAR2(1);
+  Lv_CodError       VARCHAR2(200):=NULL ;
+  Lv_codigo_tipo varchar2(1);
+begin  
+   Lv_CodError := GM_F_NATURALEZA_CUENTA(:P_Codigo_Empresa,
+					:nivel_1, 
+					:nivel_2,
+					:nivel_3,
+					:nivel_4,
+					:nivel_5,
+					:nivel_6,
+					Lv_Naturaleza_Cta);
+  IF  ( Lv_Naturaleza_Cta = 'D')
+  THEN
+    RETURN (:cf_Saldo_Actual);
+  ELSIF ( Lv_Naturaleza_Cta = 'C' ) THEN
+    RETURN ((:cf_Saldo_Actual) * -1 );
+  END IF;
+end;
+RETURN NULL; end;
 --F_CS_Saldo_Dia_Suc2
 
 
