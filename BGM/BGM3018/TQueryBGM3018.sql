@@ -1,3 +1,13 @@
+-- Parámetros utilizados en orden de aparición:
+-- 1. P_CONSOLIDATION_TYPE
+-- 2. P_BRANCH
+-- 3. P_SUBAPPLICATION
+-- 4. CP_COMPANY_CODE
+-- 5. P_DATE
+-- 6. P_USERNAME
+-- 7. P_PRINT_LINE
+-- 8. P_LOCAL_CURRENCY
+
 -- Q_STATISTICAL_BALANCES
 Select c.currency_code,
        c.level_1,
@@ -19,18 +29,18 @@ Select c.currency_code,
                    nvl(z.account_cont_level_4,'0') level_4, 
                    nvl(z.account_cont_level_5,'0') level_5,   
                    nvl(z.account_cont_level_6,'0') level_6, 
-                   nvl( decode( :p_consolidation_type,'A',nvl( z.account_cont_level_7 ,'0'),   decode(w.apply_level_7,'S', rpad('0',w.digit_quantity_level_7,'0'),'0000' )  ) 
+                   nvl( decode( P_CONSOLIDATION_TYPE,'A',nvl( z.account_cont_level_7 ,'0'),   decode(w.apply_level_7,'S', rpad('0',w.digit_quantity_level_7,'0'),'0000' )  ) 
                           ,'0') level_7,  
-                   nvl( decode( :p_consolidation_type,'A', nvl(z.account_cont_level_8,'0') ,   decode(w.apply_level_8,'S', rpad('0',w.digit_quantity_level_8,'0'),'0000' )  )
+                   nvl( decode( P_CONSOLIDATION_TYPE,'A', nvl(z.account_cont_level_8,'0') ,   decode(w.apply_level_8,'S', rpad('0',w.digit_quantity_level_8,'0'),'0000' )  )
                         ,'0') level_8
            From   (Select  i.company_code,i.application_code,i.branch_code,
                            i.subapplication_code,j.balance_type_code,j.DESCRIPTION
                    From    MG_BRANCHES_X_SUBAPPLICATION  i,
                            MG_TYPES_BALANCE               j
                    Where   i.application_code         in   ('BCC','BCA') -- BDP 
-                   and     i.branch_code             = nvl(:branch,i.branch_code)
-                   and     i.subapplication_code      = nvl(:subapplication,i.subapplication_code)
-                   and     i.company_code             = :P_COMPANY_CODE 
+                   and     i.branch_code             = nvl(P_BRANCH,i.branch_code)
+                   and     i.subapplication_code      = nvl(P_SUBAPPLICATION,i.subapplication_code)
+                   and     i.company_code             = CP_COMPANY_CODE 
                    and     j.application_code          = i.application_code 
                    and     j.balance_type_code           is not null             
                    and     nvl(j.COMPARATIVE_REPORT_USED,'N') = 'S') y,       
@@ -44,18 +54,18 @@ Select c.currency_code,
               and      z.branch_code     (+)     = y.branch_code            
               and      z.subapplication_code  (+) = y.subapplication_code      
               and      z.company_code     (+)     = y.company_code
-              and      w.company_code                  =    :P_COMPANY_CODE 
+              and      w.company_code                  =    CP_COMPANY_CODE 
           )  c,
           (Select     a.application_code,a.company_code,a.branch_code, a.subappl_code, a.balance_type_code,a.value     
-           From       CA_BALANCES_STATISTICAL  a, MG_TYPES_BALANCE      t
-           Where     a.dt  =  :P_DATE
+           From       CA_STATISTICAL_BALANCES  a, MG_TYPES_BALANCE      t
+           Where     a.dt  =  P_DATE
            And           t.application_code = a.application_code 
            And           t.balance_type_code = a.balance_type_code
            And          nvl(t.COMPARATIVE_REPORT_USED,'N') = 'S' 
            UNION
            Select     a.application_code,a.company_code,a.branch_code, a.subappl_code, a.balance_type_code,a.value     
            From       CC_BALANCES_STATISTICAL  a,MG_TYPES_BALANCE      t 
-           Where      a.dt  = :P_DATE  
+           Where      a.dt  = P_DATE  
            And           t.application_code = a.application_code 
            And           t.balance_type_code = a.balance_type_code
            And          nvl(t.COMPARATIVE_REPORT_USED,'N') = 'S' 
@@ -69,9 +79,9 @@ Select c.currency_code,
    and      d.level_6               =  c.level_6
    and      d.level_7               =  c.level_7   
    and      d.level_8               =  c.level_8
-   and      d.company_code        =  :P_COMPANY_CODE
+   and      d.company_code        =  CP_COMPANY_CODE
    and      d.code                =  'BGM3018'
-   and      d.username               = :P_USERNAME 
+   and      d.username               = P_USERNAME 
    and      b.application_code   (+)       = c.application_code
    and      b.balance_type_code   (+)       = c.balance_type_code
    and      b.branch_code       (+)      = c.branch_code            
@@ -90,7 +100,7 @@ Group by  c.currency_code,
        nvl(d.amount_2,0) 
 Having   sum(nvl(b.value,0))  <> 0
 or            nvl(d.amount_1,0) <> 0
-or          :P_PRINT_LINE = 'S'          
+or          P_PRINT_LINE = 'S'          
 order by 1,2,3,4,5,6,7,8,9,10
 
 
@@ -98,13 +108,13 @@ order by 1,2,3,4,5,6,7,8,9,10
 
 -- funciones
 -- F_CF_DESC_MONEDA
-function CF_CURRENCY_DESCFormula return Char is
+function CF_CURRENCY_DESC return Char is
  lv_description  MG_CURRENCY.description%type;
 begin
   select description
     Into lv_description
    From MG_CURRENCY 
-   Where currency_code = :currency_code;
+   Where currency_code = Q_STATISTICAL_BALANCES.currency_code;
   Return(lv_description);
 Exception 
 	When No_Data_Found Then
@@ -116,17 +126,17 @@ return ' ';
 
 
 -- F_CF_CUENTA
-function CF_ACCOUNTFormula return Char is
+function CF_ACCOUNT return Char is
   Pv_Format VARCHAR2(39);
 begin
-  GM_P_DISPLAY_R(:level_1, :level_2, :level_3, :level_4, :level_5,
-      :level_6, :level_7, :level_8,:p_company_code, Pv_Format);
+  GM_P_DESPLEGAR_R(Q_STATISTICAL_BALANCES.level_1, Q_STATISTICAL_BALANCES.level_2, Q_STATISTICAL_BALANCES.level_3, Q_STATISTICAL_BALANCES.level_4, Q_STATISTICAL_BALANCES.level_5,
+      Q_STATISTICAL_BALANCES.level_6, Q_STATISTICAL_BALANCES.level_7, Q_STATISTICAL_BALANCES.level_8,CP_COMPANY_CODE, Pv_Format);
   RETURN(Pv_Format);
 end;
 
 
 -- F_CF_DESCRIPCION
-function CF_ACCOUNT_DESCFormula return Char is
+function CF_ACCOUNT_DESC return Char is
 
  Lv_Description   Varchar2(80);
  
@@ -134,13 +144,13 @@ begin
   Select description
     Into Lv_Description
     From GM_CATALOGS
-  Where company_code = :p_company_code
-    and level_1        = :level_1
-    and level_2        = :level_2
-    and level_3        = :level_3
-    and level_4        = :level_4
-    and level_5        = :level_5
-    and level_6        = :level_6;        
+  Where company_code = CP_COMPANY_CODE
+    and level_1        = Q_STATISTICAL_BALANCES.level_1
+    and level_2        = Q_STATISTICAL_BALANCES.level_2
+    and level_3        = Q_STATISTICAL_BALANCES.level_3
+    and level_4        = Q_STATISTICAL_BALANCES.level_4
+    and level_5        = Q_STATISTICAL_BALANCES.level_5
+    and level_6        = Q_STATISTICAL_BALANCES.level_6;        
   Return(Lv_Description);                
 Exception
 	 When No_Data_Found Then
@@ -153,18 +163,18 @@ return ' ';
 
 
 -- F_CS_DIF1
-function CF_DIFFERENCEFormula return Number is
+function CF_DIFFERENCE return Number is
   Lv_AccountsOverdraft  Number := 0;
   Ln_Difference            Number := 0;
 Begin
 
-  	Ln_Difference := :acct_balance - :cs_auxiliary_balance;
+  	Ln_Difference := Q_STATISTICAL_BALANCES.acct_balance - :cs_auxiliary_balance;
 
   Return(Ln_Difference);
 end;
 
 
--- CF_SALDO_AUXILIAR_MNFormula
+-- CF_SALDO_AUXILIAR_MN
 --CF_AUXILIARY_BALANCE --SUM
 function CF_AUXILIARY_BALANCE return Number 
 is
@@ -179,23 +189,23 @@ is
   LN_WithoutOverdraftLC     NUMBER(19,6);
 begin
   
-  If :P_LOCAL_CURRENCY != :CURRENCY_CODE THEN
-    Mg_P_CambioMoneda ( :P_COMPANY_CODE,
-                				:CURRENCY_CODE,
-	                      :P_LOCAL_CURRENCY,
+  If P_LOCAL_CURRENCY != Q_STATISTICAL_BALANCES.CURRENCY_CODE THEN
+    Mg_P_CambioMoneda ( CP_COMPANY_CODE,
+                				Q_STATISTICAL_BALANCES.CURRENCY_CODE,
+	                      P_LOCAL_CURRENCY,
 	                      1, -- AccountingType
 	                      ExchangeRateDate,
-                        :TODAY_DATE,
+                        Q_STATISTICAL_BALANCES.TODAY_DATE,
  		                    SourceExchangeRate,
 		                    DestinationExchangeRate,
                         ExchangeRateValue,
-	                      :BALANCE,
+	                      Q_STATISTICAL_BALANCES.BALANCE,
                         Ln_WithoutOverdraftLC,
                         ExchangeDifference,
 	                      ProfitLoss,
 	                      Lv_ErrorMessage);
   Else
-  	Ln_WithoutOverdraftLC := :BALANCE;
+  	Ln_WithoutOverdraftLC := Q_STATISTICAL_BALANCES.BALANCE;
 	End If;
 
   RETURN(Ln_WithoutOverdraftLC);
